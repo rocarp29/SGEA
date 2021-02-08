@@ -25,9 +25,8 @@ public class EventosService {
     private UserService userService;
 
 
-    public void crearEvento(Evento evento){
-
-            eventoRepository.save(evento);
+    public Evento crearEvento(Evento evento){
+            return eventoRepository.save(evento);
 
     }
 
@@ -50,6 +49,10 @@ public class EventosService {
 
     public List<Evento> obtenerEventos(){
         return eventoRepository.findAll();
+    }
+
+    public Evento obtenerEvento(Long id){
+        return eventoRepository.findById(id).orElse(null);
     }
 
     public Evento obtenerEventoPorNombre(String nombre) throws EventNotFoundException{
@@ -104,7 +107,9 @@ public class EventosService {
             eventoEncontrado.setPresentaciones(evento.getPresentaciones());
             eventoRepository.save(eventoEncontrado);
             response.put("status","ok");
-            response.put("error", "");
+            response.put("mensaje", "Evento modificado");
+            response.put("evento", "Evento modificado");
+
             return response;
         
         }catch(EventNotFoundException unfE){
@@ -117,6 +122,26 @@ public class EventosService {
             return response;
         }
 
+    }
+
+    public Map<String,String> borrarEvento(Long idEventoABorrar) 
+    {
+        Map<String, String> response = new HashMap<>();
+
+        try{
+            
+            Evento eventoABorrar = obtenerEvento(idEventoABorrar);
+            eventoRepository.delete(eventoABorrar);
+            response.put("status", "ok");    
+            response.put("mensaje", "Evento borrado");    
+        } catch(EventNotFoundException enfE){
+            response.put("status", "error");    
+            response.put("error", "Evento no existe o ya fue borrado");    
+        }catch(IllegalArgumentException iaE){
+            response.put("status", "error");    
+            response.put("error", "Evento no existe o ya fue borrado");    
+        }
+        return response;
     }
 
 	public List<Evento> obtenerTodos() {

@@ -23,8 +23,8 @@ public class UserService {
     private UserRepository usuarioRepository;
 
 
-    public void crearUsuario(Usuario usuario){
-        usuarioRepository.save(usuario);
+    public Usuario crearUsuario(Usuario usuario){
+        return usuarioRepository.save(usuario);
     }
 
     public Usuario actualizarUsuario(Usuario usuario) throws UserNotFoundException{
@@ -128,12 +128,12 @@ public class UserService {
         }catch(UserNotFoundException unfE){
             //Log:
             usuario.setRol(Roles.USUARIO);
-            
             //TODO: añadir token
             usuario.setToken("token");
-            usuarioRepository.save(usuario);
+            Usuario usuarioRespuesta = usuarioRepository.save(usuario);
             response.put("status","ok");
-            response.put("token",getTokenPorNombre(usuario));
+            response.put("token",usuarioRespuesta.getToken());
+            response.put("idUsuario",usuarioRespuesta.getId().toString());
             return response;
         }
 
@@ -172,4 +172,39 @@ public class UserService {
         Usuario usuarioObtenido = obtenerUsuarioPorNombre(usuario.getNombre());
         return usuarioObtenido.getRol();
     }
+
+	public Usuario obtenerUsuarioPorId(Long idUsuario) {
+        return usuarioRepository.findById(idUsuario).orElse(null);
+    }
+    
+    public Map<String,String> borrarUsuario(Long idUsuarioABOrrar, Long  idAutorizante, String validateToken) 
+    {
+        Map<String, String> response = new HashMap<>();
+
+        try{
+            Usuario autorizante = obtenerUsuarioPorId(idAutorizante);
+            Usuario usuarioABorrar = obtenerUsuarioPorId(idUsuarioABOrrar);
+            boolean validToken = validateToken(autorizante, validateToken);
+            if(validToken){
+                if(autorizante.getRol() == Roles.ADMIN){
+                    response.put("token", "ok");
+                    usuarioRepository.delete(usuarioABorrar);
+                }else {
+                    response.put("token", "ok");
+                    response.put("status", "error");    
+                    response.put("error", "Error  - Usuario no tiene el rol de admin");
+                }
+            }else{
+                response.put("token", "error");
+                response.put("status", "error");
+                response.put("error", "Error  - Tokens no validos" +idUsuarioABOrrar);
+                
+            }
+        }catch(IllegalArgumentException iae){
+            response.put("status", "error");
+            response.put("error", "Error  - No existe usuario con id "+idUsuarioABOrrar);
+        } 
+        return response;
+    }
+
 }
