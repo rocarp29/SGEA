@@ -10,7 +10,7 @@ import com.templates.apirest.model.Evento;
 import com.templates.apirest.model.Presentacion;
 import com.templates.apirest.model.Usuario;
 import com.templates.apirest.service.impl.ComentarioService;
-import com.templates.apirest.service.impl.EventosService;
+import com.templates.apirest.service.impl.EventoService;
 import com.templates.apirest.service.impl.PresentacionService;
 import com.templates.apirest.service.impl.UserService;
 
@@ -31,7 +31,7 @@ public class ApirestApplication {
 	//Datos basicos de aplicacion.
 	@Bean
 	public CommandLineRunner initData2
-			(UserService userService, EventosService eventoService, 
+			(UserService userService, EventoService eventoService, 
 			ComentarioService comentarioService, PresentacionService presentacionService){
 		return args -> {
 			

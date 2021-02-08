@@ -22,17 +22,12 @@ import org.springframework.stereotype.Service;
 
 @Service
 public class ComentarioService {
-    @Autowired
+    private EventoService eventoService;
+    private UserService userService;
     private ComentarioRepository comentarioRepository;
 
-    @Autowired 
-    private UserService userService;
 
-    
-    @Autowired 
-    private EventosService eventoService;
-
-    public Comentario crearComentario(Comentario comentario){
+	public Comentario crearComentario(Comentario comentario){
 
         return comentarioRepository.save(comentario);
 
@@ -50,7 +45,8 @@ public class ComentarioService {
     }
 
     public List<Comentario> obtenerComentariosPorEvento(Evento evento) throws EventNotFoundException{
-        List<Comentario> comentariosEncontrados = obtenerComentarios().stream().filter(
+        try{
+            List<Comentario> comentariosEncontrados = obtenerComentarios().stream().filter(
             comentario -> evento.getId().equals(comentario.getId())).collect(Collectors.toList());
             if(!comentariosEncontrados.isEmpty() ){
                 return comentariosEncontrados;
@@ -58,6 +54,9 @@ public class ComentarioService {
                 //Log:
                 throw new CommentNotFoundException("Comentarios para evento no encontrado: Nombre: " + evento.getNombre(), null);
             }
+        }catch(NullPointerException npE){
+            throw new CommentNotFoundException("Comentarios para evento no encontrado: Nombre: " + evento.getNombre(), null);
+        }
     }
 
 
@@ -83,6 +82,14 @@ public class ComentarioService {
 
 
 	}
+    
+    @Autowired
+    public ComentarioService(EventoService eventoService, UserService userService, ComentarioRepository comentarioRepository) {
+        this.eventoService = eventoService;
+        this.userService = userService;
+        this.comentarioRepository = comentarioRepository;
+	}
+
 
 
 }

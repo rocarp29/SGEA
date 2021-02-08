@@ -19,8 +19,7 @@ import org.springframework.stereotype.Service;
 
 @Service
 public class UserService {
-    @Autowired
-    private UserRepository usuarioRepository;
+    private final UserRepository usuarioRepository;
 
 
     public Usuario crearUsuario(Usuario usuario){
@@ -73,9 +72,9 @@ public class UserService {
    
     }
 
-    public Map<String,String> autenticarUsuario(Usuario usuario) throws UserNotFoundException, PasswordException{
+    public Map<String,String> autenticarUsuario(Usuario usuario) throws UserNotFoundException{
 
-        Map<String,String> response = new HashMap<String,String>();
+        Map<String,String> response = new HashMap<>();
 
         try{
             Usuario usuarioEncontrado = obtenerUsuarioPorNombre(usuario.getNombre());
@@ -189,6 +188,7 @@ public class UserService {
                 if(autorizante.getRol() == Roles.ADMIN){
                     response.put("token", "ok");
                     usuarioRepository.delete(usuarioABorrar);
+                    response.put("status", "ok");    
                 }else {
                     response.put("token", "ok");
                     response.put("status", "error");    
@@ -205,6 +205,10 @@ public class UserService {
             response.put("error", "Error  - No existe usuario con id "+idUsuarioABOrrar);
         } 
         return response;
+    }
+    @Autowired
+    public UserService(UserRepository usuarioRepository){
+        this.usuarioRepository = usuarioRepository;
     }
 
 }
