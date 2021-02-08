@@ -4,8 +4,10 @@ import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
+import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
@@ -14,13 +16,15 @@ import javax.persistence.JoinTable;
 import javax.persistence.ManyToMany;
 import javax.persistence.ManyToOne;
 import javax.persistence.Table;
-@Entity
+
+import com.fasterxml.jackson.annotation.JsonIgnore;
+@Entity(name = "Presentacion")
 @Table(name = "presentacion")
 public class Presentacion {
     
     @Id
 	@Column(name = "presentacion_id")
-	@GeneratedValue(strategy = GenerationType.AUTO)
+	@GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
     @Column(name= "fecha")
@@ -33,16 +37,18 @@ public class Presentacion {
     private String ponente;
 
     @Column(name= "asistentes")
-    @ManyToMany
-    @JoinTable(
-        name = "asistentes", 
-        joinColumns = @JoinColumn(name = "usuario_id"), 
-        inverseJoinColumns = @JoinColumn(name = "presentacion_id"))
+    //fetchtype lazy porque puede haber demasiados asistentes. 
+    @ManyToMany(targetEntity = Usuario.class, cascade = {CascadeType.MERGE
+    }, fetch = FetchType.LAZY)
+    // @JoinColumn()
     private List<Usuario> asistentes;
 
     @ManyToOne()
-    @JoinColumn(name = "evento_id")
+    @JoinColumn(name = "evento")
+    @JsonIgnore
     private Evento evento;
+
+    
 
     public Presentacion(String titulo, String ponente){
         this.date = LocalDateTime.now();
@@ -57,6 +63,15 @@ public class Presentacion {
         this.ponente = ponente;
         this.asistentes = new ArrayList<>();
     }
+
+    public Presentacion(LocalDateTime date, String titulo, String ponente, Evento evento){
+        this.date = date;
+        this.titulo = titulo;
+        this.ponente = ponente;
+        this.asistentes = new ArrayList<>();
+        this.evento = evento;
+    }
+
 
 
     public void setDate(LocalDateTime date) {
@@ -101,6 +116,14 @@ public class Presentacion {
 
     public void setEvento(Evento evento) {
         this.evento = evento;
+    }
+
+    public void addAsistente(Usuario usuario){
+        this.asistentes.add(usuario);
+        
+    }
+    public Presentacion(){
+
     }
 
 

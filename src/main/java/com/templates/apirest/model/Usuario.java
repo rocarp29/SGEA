@@ -1,6 +1,7 @@
 package com.templates.apirest.model;
 
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.templates.apirest.configuracion.Roles;
 
@@ -15,7 +16,7 @@ public class Usuario {
 
 	@Id
 	@Column(name = "usuario_id")
-	@GeneratedValue(strategy = GenerationType.AUTO)
+	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private Long id;
 
 	//@JsonProperty("nombre")
@@ -23,6 +24,7 @@ public class Usuario {
 	private String nombre;
 
 	//@JsonProperty("password")
+	@JsonIgnore
 	@Column(name = "password")
 	private String password;
 
@@ -30,11 +32,19 @@ public class Usuario {
 	@Column(name = "rol")
 	private Roles rol;
 
+	@JsonIgnore
 	@Column(name = "token")
 	private String token;
 
 	@ManyToMany(mappedBy = "asistentes")
-	private List<Presentacion> asistentes;
+    // @JoinColumn(name = "asistentes")
+    @JsonIgnore
+	private List<Presentacion> presentaciones;
+
+	@OneToMany(mappedBy = "usuario")
+    // @JoinColumn(name = "asistentes")
+    @JsonIgnore
+	private List<Comentario> comentarios;
 
 
 	public Usuario(){
@@ -88,12 +98,16 @@ public class Usuario {
 		this.token = token;
 	}
 
-	public List<Presentacion> getAsistentes() {
-		return asistentes;
+	public List<Presentacion> getPresentaciones() {
+		return presentaciones;
 	}
 
-	public void setAsistentes(List<Presentacion> asistentes) {
-		this.asistentes = asistentes;
+	public void setAsistentes(List<Presentacion> presentaciones) {
+		this.presentaciones = presentaciones;
+	}
+
+	public void addAsistencia(Presentacion presentacion){
+		this.presentaciones.add(presentacion);
 	}
 
 	

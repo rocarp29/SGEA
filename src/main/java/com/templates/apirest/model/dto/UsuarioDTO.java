@@ -51,5 +51,7 @@ public class UsuarioDTO {
         this.rol = rolDTO;
         this.token = tokenDTO;
     }
+	public UsuarioDTO() {
+	}
     
 }
